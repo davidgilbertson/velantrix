@@ -6,7 +6,7 @@
   "scripts": {
     "deploy": "firebase deploy",
     "deploy:functions": "firebase deploy --only functions",
-    "emulate": "firebase emulators:start"
+    "start": "firebase emulators:start"
   },
   "keywords": [],
   "author": "",
