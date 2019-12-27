@@ -1,6 +1,7 @@
 const functions = require('firebase-functions');
 const admin = require('firebase-admin');
 const uuid = require('uuid/v4');
+const orderKeys = require('./orderKeys');
 
 admin.initializeApp(functions.config().firebase);
 const collection = admin.firestore().collection('all');
@@ -30,7 +31,7 @@ module.exports = {
   async read(id) {
     const docRef = await collection.doc(id).get();
 
-    return docRef.exists ? docRef.data() : undefined;
+    return docRef.exists ? orderKeys(docRef.data()) : undefined;
   },
 
   async update(id, rawData) {
