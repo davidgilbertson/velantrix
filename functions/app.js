@@ -5,10 +5,11 @@ const database = require('./database');
 const app = express();
 
 const ORIGIN_WHITELIST = [
+  /localhost:/,
+  'https://discomundus.web.app',
   'https://scatter-bar.web.app',
   'https://sydsubmem.web.app',
   'https://talkonanon.web.app',
-  /localhost:/
 ];
 
 app.use(cors({origin: ORIGIN_WHITELIST}));
