@@ -1,7 +1,7 @@
-// This provides the ability to stringify/parse an object in such a way that the resulting
-// JSON string will be the same given the same data.
-// Native JSON.stringify() doesn't support this since key order can change.
-
+// This orders the keys of an object, so that JSON.stringify will return
+// the same string for any two deeply equal objects.
+// This handles the issue of Firebase's random key order which
+// would otherwise result in non-matching strings
 const orderKeys = object => {
   if (Array.isArray(object)) return object.map(orderKeys);
 
