@@ -14,7 +14,7 @@ const ORIGIN_WHITELIST = [
 
 app.use(cors({origin: ORIGIN_WHITELIST}));
 
-
+// All handlers return a JSON object with one of four props: error, success, id or data
 app.post('/', async (req, res, next) => {
   try {
     const id = await database.create(req.body);
@@ -30,7 +30,7 @@ app.get('/:id', async (req, res, next) => {
     const data = await database.read(req.params.id);
 
     if (data) {
-      res.json(data);
+      res.json({data});
     } else {
       res.status(404).json({error: 'No item with that ID exists'});
     }
