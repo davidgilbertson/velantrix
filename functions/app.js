@@ -6,6 +6,7 @@ const app = express();
 
 const ORIGIN_WHITELIST = [
   /localhost:/,
+  /127\.0\.0\.1:/,
   'https://discomundus.web.app',
   'https://scatter-bar.web.app',
   'https://sydsubmem.web.app',
