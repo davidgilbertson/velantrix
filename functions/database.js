@@ -1,6 +1,7 @@
 const functions = require('firebase-functions');
 const admin = require('firebase-admin');
 const uuid = require('uuid/v4');
+const lodashGet = require('lodash/get');
 const orderKeys = require('./orderKeys');
 
 admin.initializeApp(functions.config().firebase);
@@ -42,6 +43,47 @@ module.exports = {
 
     const data = prepareDataForFirebase(rawData);
     await collection.doc(id).set(data);
+
+    return true;
+  },
+
+  /**
+   * Updates an item in an array, matching on `id`, replacing the old item.
+   * Creates a new array item if none exists
+   *
+   * @param {string|number} id - the ID of the document (NOT of the item to update)
+   * @param {string} path - a path, in Lodash get() syntax
+   * @param {{id: *}} data - the new item
+   * @return {Promise<boolean>}
+   */
+  async arrayUpsert({id, path, data: newItem}) {
+    const docRef = await collection.doc(id).get();
+
+    // Update must fail if the specified item does not already exist
+    if (!docRef.exists) return false;
+
+    const array = lodashGet(docRef.data(), path);
+
+    if (!Array.isArray(array)) {
+      console.error('array:', array);
+      throw Error(`The value at ${path} is not an array`)
+    }
+
+    let itemExists = false;
+    const nextArray = array.map(existingItem => {
+      if (existingItem.id === newItem.id) {
+        itemExists = true;
+        return newItem;
+      }
+
+      return existingItem;
+    });
+
+    if (!itemExists) nextArray.push(newItem);
+
+    await collection.doc(id).update({
+      [path]: nextArray,
+    });
 
     return true;
   },

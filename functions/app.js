@@ -44,11 +44,39 @@ app.put('/:id', async (req, res, next) => {
     const success = await database.update(req.params.id, req.body);
 
     if (success) {
-      // TODO (davidg): should PUT return the item just before it was updated?
-      //  Pros: useful for a chat app. Cons: network usage
       res.json({success: 'Item updated'});
     } else {
       res.status(404).json({error: 'No item with that ID exists'});
+    }
+  } catch (err) {
+    next(err);
+  }
+});
+
+app.patch('/:id', async (req, res, next) => {
+  const returnError = message => {
+    res.status(500).json({error: message});
+  };
+
+  try {
+    if (!req.body.action || !req.body.path || !req.body.data) {
+      returnError('You must provide an `action`, `path`, and `data` prop');
+    } else if (!req.body.data.id) {
+      returnError('The `data` prop you passed does not have an `id` prop');
+    } else if (req.body.action === 'ARRAY_UPSERT') {
+      const success = await database.arrayUpsert({
+        id: req.params.id,
+        path: req.body.path,
+        data: req.body.data,
+      });
+
+      if (success) {
+        res.json({success: 'Item upserted'});
+      } else {
+        res.status(404).json({error: 'No item with that ID exists'});
+      }
+    } else {
+      returnError(`${req.body.action} is not a valid action`);
     }
   } catch (err) {
     next(err);
